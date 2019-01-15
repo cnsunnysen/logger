@@ -29,6 +29,10 @@ public abstract class BaseLoggingEntity implements Serializable {
     @ApiModelProperty("日志类型:子类自行实现")
     private String logType;
 
+    @Column(name = "log_platform")
+    @ApiModelProperty("日志所属平台")
+    private String logPlatform;
+
     @Column(name = "log_group_id")
     @ApiModelProperty("日志分组id")
     private String logGroupId;
@@ -96,5 +100,13 @@ public abstract class BaseLoggingEntity implements Serializable {
 
     public void setLogCreateDatetime(Date logCreateDatetime) {
         this.logCreateDatetime = logCreateDatetime;
+    }
+
+    public String getLogPlatform() {
+        return logPlatform;
+    }
+
+    public void setLogPlatform(String logPlatform) {
+        this.logPlatform = logPlatform;
     }
 }
