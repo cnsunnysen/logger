@@ -18,7 +18,6 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableSwagger2
 public class Swagger2Config {
 
-
     /**
      * 添加摘要信息(Docket)
      */
@@ -34,7 +33,7 @@ public class Swagger2Config {
                 ;
     }
 
-    private ApiInfo apiInfo(){
+    private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
                 .title("日志系统_接口文档")
                 .description("描述：通用日志处理,查询")

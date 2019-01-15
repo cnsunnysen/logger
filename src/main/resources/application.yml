@@ -1,0 +1,15 @@
+server:
+  servlet:
+    context-path: /logging
+  port: 8888
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/wb_dzwl_donghai?useSSL=FALSE&serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=UTF-8
+    username: wbcrm
+    password: wbcrm001
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    type: com.zaxxer.hikari.HikariDataSource
+logging:
+  level:
+    com.mysteelsoft.logger: TRACE
+debug: true
