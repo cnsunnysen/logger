@@ -1,6 +1,7 @@
 package com.mysteelsoft.logger.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.mysteelsoft.logger.config.LogConstant;
 import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -58,6 +59,7 @@ public abstract class BaseLoggingEntity implements Serializable {
      */
     public BaseLoggingEntity autoConfig() {
 //        logGroupId = Thread.currentThread().getId()+"";
+        logPlatform = LogConstant.LOG_PLATFORM_KEY;
         logCreateDatetime = new Date();
         return this;
     }
