@@ -40,11 +40,11 @@ public interface LoggingService {
      *
      * @param request
      * @param response
-     * @param chars
+     * @param content
      * @return
      * @throws ServletException
      */
-    RequestLoggingEntity doRequestLogger(HttpServletRequest request, ContentCachingResponseWrapper response, char[] chars) throws ServletException;
+    RequestLoggingEntity doRequestLogger(HttpServletRequest request, ContentCachingResponseWrapper response, String content) throws ServletException;
 
 
     /**
@@ -52,11 +52,11 @@ public interface LoggingService {
      *
      * @param request
      * @param response
-     * @param chars
+     * @param content
      * @param groupId
      * @return
      */
-    ResponseLoggingEntity doResponseLogger(HttpServletRequest request, ContentCachingResponseWrapper response, char[] chars, String groupId);
+    ResponseLoggingEntity doResponseLogger(HttpServletRequest request, ContentCachingResponseWrapper response, String content, String groupId);
 
     /**
      * 请求日志详情

@@ -99,7 +99,7 @@ public class HttpLoggingFilter extends OncePerRequestFilter {
             //执行后续filter以及内部程序
             filterChain.doFilter(requestToUse, responseToUse);
             if (isLogRequest) {
-                doResponseLogger((RequestLoggingWrapper) requestToUse, (ContentCachingResponseWrapper) responseToUse, groupId);
+                doResponseLogger( requestToUse, (ContentCachingResponseWrapper) responseToUse, groupId);
             }
         } finally {
 
@@ -117,7 +117,8 @@ public class HttpLoggingFilter extends OncePerRequestFilter {
             return;
         }
         byte[] contentAsByteArray = null;
-        if(requestToUse instanceof ContentCachingRequestWrapper ){
+        if(requestToUse instanceof ContentCachingRequestWrapper){
+            ((ContentCachingRequestWrapper) requestToUse).getParameterNames();
             contentAsByteArray = ((ContentCachingRequestWrapper) requestToUse).getContentAsByteArray();
         }else{
             contentAsByteArray = ((RequestLoggingWrapper) requestToUse).getOnceBody();
@@ -128,8 +129,9 @@ public class HttpLoggingFilter extends OncePerRequestFilter {
         try {
             String groupId = UUID.randomUUID().toString().replaceAll("-", "");
             responseToUse.setHeader(LogConstant.GROUP_ID_HEADER_KEY, groupId);
-            char[] chars = getChars(contentAsByteArray, Charset.forName(requestToUse.getCharacterEncoding()));
-            loggingService.doRequestLogger(requestToUse, responseToUse, chars);
+//            char[] chars = getChars(contentAsByteArray, Charset.forName(requestToUse.getCharacterEncoding()));
+            String content = new String(contentAsByteArray,Charset.forName(requestToUse.getCharacterEncoding()));
+            loggingService.doRequestLogger(requestToUse, responseToUse, content);
         } catch (Exception e) {
             log.error("请求日志自身问题不向外抛出", e);
         }
@@ -142,18 +144,15 @@ public class HttpLoggingFilter extends OncePerRequestFilter {
      * @param responseToUse
      * @throws IOException
      */
-    private void doResponseLogger(RequestLoggingWrapper requestToUse, ContentCachingResponseWrapper responseToUse, String groupId) throws IOException {
+    private void doResponseLogger(HttpServletRequest requestToUse, ContentCachingResponseWrapper responseToUse, String groupId) throws IOException {
         if (responseToUse == null) {
             return;
         }
         try {
-            byte[] bytes = FileCopyUtils.copyToByteArray(responseToUse.getContentInputStream());
-            char[] chars = getChars(bytes, Charset.forName(requestToUse.getCharacterEncoding()));
-//            String str = new String(bytes, Charset.forName(requestToUse.getCharacterEncoding()));
-//            JsonNode jsonNode = objectMapper.readTree(str);
+            byte[] contentAsByteArray = FileCopyUtils.copyToByteArray(responseToUse.getContentInputStream());
+            String content = new String(contentAsByteArray,Charset.forName(requestToUse.getCharacterEncoding()));
             responseToUse.copyBodyToResponse();
-            log.info("1.groupId:{}", responseToUse.getHeader(LogConstant.GROUP_ID_HEADER_KEY));
-            loggingService.doResponseLogger(requestToUse, responseToUse, chars, groupId);
+            loggingService.doResponseLogger(requestToUse, responseToUse, content, groupId);
         } catch (Exception e) {
             log.error("响应日志自身问题不向外抛出", e);
         } finally {

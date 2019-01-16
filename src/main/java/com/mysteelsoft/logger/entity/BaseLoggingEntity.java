@@ -48,7 +48,7 @@ public abstract class BaseLoggingEntity implements Serializable {
     @Basic(fetch = FetchType.LAZY)
     @Column(name = "log_content", columnDefinition = "TEXT")
     @ApiModelProperty("日志内容")
-    private char[] logContent;
+    private String logContent;
 
     public BaseLoggingEntity() {
     }
@@ -80,11 +80,11 @@ public abstract class BaseLoggingEntity implements Serializable {
         this.logType = logType;
     }
 
-    public char[] getLogContent() {
+    public String getLogContent() {
         return logContent;
     }
 
-    public void setLogContent(char[] logContent) {
+    public void setLogContent(String logContent) {
         this.logContent = logContent;
     }
 

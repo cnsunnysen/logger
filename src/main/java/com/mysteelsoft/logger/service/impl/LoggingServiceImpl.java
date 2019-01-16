@@ -62,7 +62,7 @@ public class LoggingServiceImpl implements LoggingService {
 
     @Override
     @Async
-    public RequestLoggingEntity doRequestLogger(HttpServletRequest request, ContentCachingResponseWrapper response, char[] chars) throws ServletException {
+    public RequestLoggingEntity doRequestLogger(HttpServletRequest request, ContentCachingResponseWrapper response, String content) throws ServletException {
         RequestLoggingEntity logEntity = new RequestLoggingEntity();
         logEntity.autoConfig();
         logEntity.setLogGroupId(response.getHeader(LogConstant.GROUP_ID_HEADER_KEY));
@@ -77,7 +77,7 @@ public class LoggingServiceImpl implements LoggingService {
         String ip = getIpAddress(request);
         logEntity.setIp(ip);
         //内容
-        logEntity.setLogContent(chars);
+        logEntity.setLogContent(content);
         logger.info("2");
         //保存
         logEntity = requestLoggingRepository.save(logEntity);
@@ -86,12 +86,12 @@ public class LoggingServiceImpl implements LoggingService {
 
     @Override
 //    @Async
-    public ResponseLoggingEntity doResponseLogger(HttpServletRequest request, ContentCachingResponseWrapper response, char[] chars, String groupId) {
+    public ResponseLoggingEntity doResponseLogger(HttpServletRequest request, ContentCachingResponseWrapper response, String content, String groupId) {
         ResponseLoggingEntity logEntity = new ResponseLoggingEntity();
         logEntity.autoConfig();
         logger.info("2.groupId:{}", response.getHeader(LogConstant.GROUP_ID_HEADER_KEY));
         logEntity.setLogGroupId(response.getHeader(LogConstant.GROUP_ID_HEADER_KEY));
-        logEntity.setLogContent(chars);
+        logEntity.setLogContent(content);
         logEntity.setStatus(response.getStatusCode());
         String headers = response.getHeaderNames().stream().map(key -> response.getHeader(key)).collect(Collectors.joining(", ", "[", "]"));
         logEntity.setHeaders(headers);
