@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.util.*;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.util.ContentCachingRequestWrapper;
 import org.springframework.web.util.ContentCachingResponseWrapper;
 
 import javax.servlet.FilterChain;
@@ -83,9 +84,13 @@ public class HttpLoggingFilter extends OncePerRequestFilter {
         if (shouldLog && isFirstRequest) {
             if (notIgnoreRequest(request)) {
                 isLogRequest = true;
-                requestToUse = new RequestLoggingWrapper(request);
+                if(StringUtils.startsWithIgnoreCase(request.getContentType(), MediaType.APPLICATION_FORM_URLENCODED_VALUE)){
+                    requestToUse = new ContentCachingRequestWrapper(request);
+                }else{
+                    requestToUse = new RequestLoggingWrapper(request);
+                }
                 responseToUse = new ContentCachingResponseWrapper(response);
-                doRequestLogger((RequestLoggingWrapper) requestToUse, (ContentCachingResponseWrapper) responseToUse);
+                doRequestLogger(requestToUse, (ContentCachingResponseWrapper) responseToUse);
             } else {
                 log.debug("HttpLoggingFilter ignore path:{}", getRequestPath(requestToUse));
             }
@@ -107,18 +112,23 @@ public class HttpLoggingFilter extends OncePerRequestFilter {
      * @param requestToUse
      * @throws UnsupportedEncodingException
      */
-    private void doRequestLogger(RequestLoggingWrapper requestToUse, ContentCachingResponseWrapper responseToUse) throws UnsupportedEncodingException, ServletException {
+    private void doRequestLogger(HttpServletRequest requestToUse, ContentCachingResponseWrapper responseToUse) throws UnsupportedEncodingException, ServletException {
         if (requestToUse == null) {
             return;
         }
-        byte[] onceBody = requestToUse.getOnceBody();
-        if (onceBody == null) {
+        byte[] contentAsByteArray = null;
+        if(requestToUse instanceof ContentCachingRequestWrapper ){
+            contentAsByteArray = ((ContentCachingRequestWrapper) requestToUse).getContentAsByteArray();
+        }else{
+            contentAsByteArray = ((RequestLoggingWrapper) requestToUse).getOnceBody();
+        }
+        if (contentAsByteArray == null) {
             return;
         }
         try {
             String groupId = UUID.randomUUID().toString().replaceAll("-", "");
             responseToUse.setHeader(LogConstant.GROUP_ID_HEADER_KEY, groupId);
-            char[] chars = getChars(onceBody, Charset.forName(requestToUse.getCharacterEncoding()));
+            char[] chars = getChars(contentAsByteArray, Charset.forName(requestToUse.getCharacterEncoding()));
             loggingService.doRequestLogger(requestToUse, responseToUse, chars);
         } catch (Exception e) {
             log.error("请求日志自身问题不向外抛出", e);
