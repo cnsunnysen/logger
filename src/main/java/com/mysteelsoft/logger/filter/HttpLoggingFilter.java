@@ -89,6 +89,8 @@ public class HttpLoggingFilter extends OncePerRequestFilter {
                 }else{
                     requestToUse = new RequestLoggingWrapper(request);
                 }
+                groupId = UUID.randomUUID().toString().replaceAll("-", "");
+                responseToUse.setHeader(LogConstant.GROUP_ID_HEADER_KEY, groupId);
                 responseToUse = new ContentCachingResponseWrapper(response);
                 doRequestLogger(requestToUse, (ContentCachingResponseWrapper) responseToUse);
             } else {
@@ -127,8 +129,6 @@ public class HttpLoggingFilter extends OncePerRequestFilter {
             return;
         }
         try {
-            String groupId = UUID.randomUUID().toString().replaceAll("-", "");
-            responseToUse.setHeader(LogConstant.GROUP_ID_HEADER_KEY, groupId);
 //            char[] chars = getChars(contentAsByteArray, Charset.forName(requestToUse.getCharacterEncoding()));
             String content = new String(contentAsByteArray,Charset.forName(requestToUse.getCharacterEncoding()));
             loggingService.doRequestLogger(requestToUse, responseToUse, content);

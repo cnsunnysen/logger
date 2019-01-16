@@ -77,7 +77,15 @@ public class LoggingServiceImpl implements LoggingService {
         String ip = getIpAddress(request);
         logEntity.setIp(ip);
         //内容
-        logEntity.setLogContent(content);
+        String finalContent = content;
+        if(content.length()>20000){
+            StringBuilder sb = new StringBuilder("日志实体长度:");
+            sb.append(content.length());
+            sb.append(",截取前20000个字符,:");
+            sb.append(content, 0, 20000);
+            finalContent = sb.toString();
+        }
+        logEntity.setLogContent(finalContent);
         logger.info("2");
         //保存
         logEntity = requestLoggingRepository.save(logEntity);
@@ -89,9 +97,16 @@ public class LoggingServiceImpl implements LoggingService {
     public ResponseLoggingEntity doResponseLogger(HttpServletRequest request, ContentCachingResponseWrapper response, String content, String groupId) {
         ResponseLoggingEntity logEntity = new ResponseLoggingEntity();
         logEntity.autoConfig();
-        logger.info("2.groupId:{}", response.getHeader(LogConstant.GROUP_ID_HEADER_KEY));
-        logEntity.setLogGroupId(response.getHeader(LogConstant.GROUP_ID_HEADER_KEY));
-        logEntity.setLogContent(content);
+        logEntity.setLogGroupId(groupId);
+        String finalContent = content;
+        if(content.length()>20000){
+            StringBuilder sb = new StringBuilder("日志实体长度:");
+            sb.append(content.length());
+            sb.append(",截取前20000个字符,:");
+            sb.append(content, 0, 20000);
+            finalContent = sb.toString();
+        }
+        logEntity.setLogContent(finalContent);
         logEntity.setStatus(response.getStatusCode());
         String headers = response.getHeaderNames().stream().map(key -> response.getHeader(key)).collect(Collectors.joining(", ", "[", "]"));
         logEntity.setHeaders(headers);
